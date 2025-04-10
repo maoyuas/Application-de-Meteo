@@ -1,5 +1,4 @@
-// Remplacez 'VOTRE_CLE_API' par votre clé API OpenWeatherMap
-const API_KEY = '6468fbaf5dc4d5c79fa066e77ead3d3a';
+const API_KEY = '9c84c21b0c2c4c8c9c4c8c9c4c8c9c4c';
 const weatherInfo = document.querySelector('.weather-info');
 const forecastContainer = document.querySelector('.forecast-container');
 const loadingContainer = document.querySelector('.loading-container');
@@ -9,18 +8,14 @@ const favoritesContainer = document.querySelector('.favorites-container');
 const favoriteBtn = document.getElementById('favorite-btn');
 const locationBtn = document.getElementById('location-btn');
 
-// Variables pour les graphiques
 let tempChart = null;
 let humidityChart = null;
 
-// Gestion du mode sombre/clair
 const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
 
-// Variables pour les unités
 let currentTempUnit = localStorage.getItem('tempUnit') || 'metric';
 let currentWindUnit = localStorage.getItem('windUnit') || 'metric';
 
-// Variables pour l'historique des recherches
 const searchHistoryContainer = document.querySelector('.search-history-container');
 const MAX_HISTORY_ITEMS = 10;
 
@@ -34,7 +29,6 @@ function switchTheme(e) {
     }
 }
 
-// Vérifier la préférence sauvegardée
 const currentTheme = localStorage.getItem('theme');
 if (currentTheme) {
     document.documentElement.setAttribute('data-theme', currentTheme);
@@ -45,7 +39,6 @@ if (currentTheme) {
 
 toggleSwitch.addEventListener('change', switchTheme);
 
-// Fonction pour mettre à jour l'heure
 function updateTime() {
     const timeElement = document.querySelector('.current-time');
     const now = new Date();
@@ -55,17 +48,13 @@ function updateTime() {
     });
 }
 
-// Mettre à jour l'heure toutes les secondes
 setInterval(updateTime, 1000);
 
-// Fonction pour changer le fond selon le temps
 function updateBackground(weatherCode) {
     const body = document.body;
 
-    // Supprimer toutes les classes de fond
     body.classList.remove('sunny', 'cloudy', 'rainy', 'snowy', 'default');
 
-    // Ajouter la classe appropriée selon le code météo
     if (weatherCode >= 200 && weatherCode < 600) {
         body.classList.add('rainy');
     } else if (weatherCode >= 600 && weatherCode < 700) {
@@ -81,7 +70,6 @@ function updateBackground(weatherCode) {
     }
 }
 
-// Fonction pour convertir les unités
 function convertTemp(celsius) {
     if (currentTempUnit === 'imperial') {
         return (celsius * 9 / 5) + 32;
@@ -96,7 +84,6 @@ function convertWindSpeed(kmh) {
     return kmh;
 }
 
-// Fonction pour obtenir le symbole de l'unité
 function getTempSymbol() {
     return currentTempUnit === 'metric' ? '°C' : '°F';
 }
@@ -105,7 +92,6 @@ function getWindSymbol() {
     return currentWindUnit === 'metric' ? 'km/h' : 'mph';
 }
 
-// Fonction pour mettre à jour l'affichage avec les nouvelles unités
 function updateDisplayWithUnits(data) {
     const temperature = document.querySelector('.temperature');
     const windSpeed = document.querySelector('.wind-speed');
@@ -120,7 +106,6 @@ function updateDisplayWithUnits(data) {
     feelsLike.textContent = `${Math.round(convertTemp(feelsLikeC))}${getTempSymbol()}`;
 }
 
-// Fonction pour formater la date
 function formatDate(date) {
     const now = new Date();
     const diff = now - date;
@@ -137,20 +122,16 @@ function formatDate(date) {
     }
 }
 
-// Fonction pour ajouter une recherche à l'historique
 function addToSearchHistory(city) {
     let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
-    // Supprimer la ville si elle existe déjà
     searchHistory = searchHistory.filter(item => item.city !== city);
 
-    // Ajouter la nouvelle recherche au début
     searchHistory.unshift({
         city: city,
         timestamp: new Date().toISOString()
     });
 
-    // Limiter l'historique à MAX_HISTORY_ITEMS éléments
     if (searchHistory.length > MAX_HISTORY_ITEMS) {
         searchHistory = searchHistory.slice(0, MAX_HISTORY_ITEMS);
     }
@@ -159,7 +140,6 @@ function addToSearchHistory(city) {
     displaySearchHistory();
 }
 
-// Fonction pour afficher l'historique des recherches
 function displaySearchHistory() {
     const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
     const historyList = document.querySelector('.search-history-list');
@@ -177,7 +157,6 @@ function displaySearchHistory() {
                 <span class="remove-history" data-city="${item.city}">×</span>
             `;
 
-            // Ajouter un écouteur d'événements pour cliquer sur la ville
             historyItem.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('remove-history')) {
                     document.getElementById('city-input').value = item.city;
@@ -185,7 +164,6 @@ function displaySearchHistory() {
                 }
             });
 
-            // Ajouter un écouteur d'événements pour supprimer l'élément
             const removeBtn = historyItem.querySelector('.remove-history');
             removeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -201,7 +179,6 @@ function displaySearchHistory() {
     }
 }
 
-// Fonction pour supprimer une ville de l'historique
 function removeFromSearchHistory(city) {
     let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
     searchHistory = searchHistory.filter(item => item.city !== city);
@@ -209,16 +186,13 @@ function removeFromSearchHistory(city) {
     displaySearchHistory();
 }
 
-// Fonction pour vider l'historique
 function clearSearchHistory() {
     localStorage.removeItem('searchHistory');
     displaySearchHistory();
 }
 
-// Fonction pour obtenir la météo actuelle
 async function getWeather(city) {
     try {
-        // Afficher l'animation de chargement
         loadingContainer.style.display = 'block';
         weatherInfo.classList.remove('active');
         forecastContainer.classList.remove('active');
@@ -229,20 +203,16 @@ async function getWeather(city) {
         const data = await response.json();
 
         if (response.ok) {
-            // Mettre à jour le fond selon le temps
             updateBackground(data.weather[0].id);
 
-            // Masquer l'animation de chargement
             loadingContainer.style.display = 'none';
 
             displayWeather(data);
             getForecast(city);
             checkWeatherAlerts(city);
 
-            // Mettre à jour le bouton favoris
             updateFavoriteButton(city);
 
-            // Ajouter à l'historique des recherches
             addToSearchHistory(city);
         } else {
             loadingContainer.style.display = 'none';
@@ -255,7 +225,6 @@ async function getWeather(city) {
     }
 }
 
-// Fonction pour obtenir les prévisions sur 5 jours
 async function getForecast(city) {
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=fr`);
@@ -263,22 +232,19 @@ async function getForecast(city) {
 
         if (response.ok) {
             displayForecast(data);
-            createCharts(data); // Créer les graphiques
+            createCharts(data);
         }
     } catch (error) {
         console.error('Erreur prévisions:', error);
     }
 }
 
-// Fonction pour vérifier les alertes météo
 async function checkWeatherAlerts(city) {
     try {
-        // Vérifier si city est un objet avec lat et lon ou une chaîne de caractères
         let url;
         if (typeof city === 'object' && city.lat && city.lon) {
             url = `https://api.openweathermap.org/data/2.5/onecall?lat=${city.lat}&lon=${city.lon}&exclude=minutely,hourly,daily&appid=${API_KEY}&units=metric&lang=fr`;
         } else {
-            // Si c'est une chaîne de caractères, d'abord obtenir les coordonnées
             const geoResponse = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`);
             const geoData = await geoResponse.json();
 
@@ -303,7 +269,6 @@ async function checkWeatherAlerts(city) {
     }
 }
 
-// Fonction pour afficher les alertes météo
 function displayWeatherAlerts(alerts) {
     const alertsContainer = document.querySelector('.alerts-container');
     alertsContainer.innerHTML = '';
@@ -321,7 +286,6 @@ function displayWeatherAlerts(alerts) {
     weatherAlerts.style.display = 'block';
 }
 
-// Fonction pour afficher les informations météo actuelles
 function displayWeather(data) {
     const cityName = document.querySelector('.city-name');
     const weatherIcon = document.querySelector('.weather-icon');
@@ -340,7 +304,6 @@ function displayWeather(data) {
     updateTime();
 }
 
-// Fonction pour afficher les prévisions
 function displayForecast(data) {
     const forecastList = document.querySelector('.forecast-list');
     forecastList.innerHTML = '';
@@ -367,14 +330,11 @@ function displayForecast(data) {
     forecastContainer.classList.add('active');
 }
 
-// Fonction pour créer les graphiques
 function createCharts(data) {
-    // Préparer les données pour les graphiques
     const labels = [];
     const temperatures = [];
     const humidities = [];
 
-    // Filtrer pour n'avoir qu'une prévision par jour (à midi)
     const dailyForecasts = data.list.filter(forecast => forecast.dt_txt.includes('12:00:00'));
 
     dailyForecasts.forEach(forecast => {
@@ -386,10 +346,8 @@ function createCharts(data) {
         humidities.push(forecast.main.humidity);
     });
 
-    // Créer le graphique de température
     const tempCtx = document.getElementById('temp-chart').getContext('2d');
 
-    // Détruire le graphique existant s'il existe
     if (tempChart) {
         tempChart.destroy();
     }
@@ -422,10 +380,8 @@ function createCharts(data) {
         }
     });
 
-    // Créer le graphique d'humidité
     const humidityCtx = document.getElementById('humidity-chart').getContext('2d');
 
-    // Détruire le graphique existant s'il existe
     if (humidityChart) {
         humidityChart.destroy();
     }
@@ -459,11 +415,9 @@ function createCharts(data) {
         }
     });
 
-    // Afficher les graphiques
     chartsContainer.classList.add('active');
 }
 
-// Fonction pour obtenir la météo par géolocalisation
 function getWeatherByLocation() {
     if (navigator.geolocation) {
         loadingContainer.style.display = 'block';
@@ -472,7 +426,6 @@ function getWeatherByLocation() {
         chartsContainer.classList.remove('active');
         weatherAlerts.style.display = 'none';
 
-        // Options pour améliorer la précision de la géolocalisation
         const options = {
             enableHighAccuracy: true,
             timeout: 10000,
@@ -487,22 +440,18 @@ function getWeatherByLocation() {
 
                     console.log(`Position obtenue: ${lat}, ${lon}`);
 
-                    // Utiliser les coordonnées pour obtenir la météo
                     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=fr`);
                     const data = await response.json();
 
                     if (response.ok) {
-                        // Mettre à jour le fond selon le temps
                         updateBackground(data.weather[0].id);
 
-                        // Masquer l'animation de chargement
                         loadingContainer.style.display = 'none';
 
                         displayWeather(data);
                         getForecastByCoords(lat, lon);
                         checkWeatherAlerts({ lat, lon });
 
-                        // Mettre à jour le bouton favoris
                         updateFavoriteButton(data.name);
                     } else {
                         loadingContainer.style.display = 'none';
@@ -518,7 +467,6 @@ function getWeatherByLocation() {
                 loadingContainer.style.display = 'none';
                 console.error('Erreur de géolocalisation:', error);
 
-                // En cas d'erreur de géolocalisation, utiliser Paris 17e comme position par défaut
                 console.log('Utilisation de Paris 17e comme position par défaut');
                 getWeather('Paris,FR');
             },
@@ -530,7 +478,6 @@ function getWeatherByLocation() {
     }
 }
 
-// Fonction pour obtenir les prévisions par coordonnées
 async function getForecastByCoords(lat, lon) {
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=fr`);
@@ -545,7 +492,6 @@ async function getForecastByCoords(lat, lon) {
     }
 }
 
-// Fonction pour gérer les favoris
 function loadFavorites() {
     const favorites = JSON.parse(localStorage.getItem('weatherFavorites')) || [];
     const favoritesList = document.querySelector('.favorites-list');
@@ -560,7 +506,6 @@ function loadFavorites() {
                 <span class="remove-favorite" data-city="${city}">×</span>
             `;
 
-            // Ajouter un écouteur d'événements pour cliquer sur la ville
             favoriteItem.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('remove-favorite')) {
                     document.getElementById('city-input').value = city;
@@ -568,7 +513,6 @@ function loadFavorites() {
                 }
             });
 
-            // Ajouter un écouteur d'événements pour supprimer la ville
             const removeBtn = favoriteItem.querySelector('.remove-favorite');
             removeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -584,7 +528,6 @@ function loadFavorites() {
     }
 }
 
-// Fonction pour ajouter une ville aux favoris
 function addFavorite(city) {
     const favorites = JSON.parse(localStorage.getItem('weatherFavorites')) || [];
 
@@ -597,7 +540,6 @@ function addFavorite(city) {
     updateFavoriteButton(city);
 }
 
-// Fonction pour supprimer une ville des favoris
 function removeFavorite(city) {
     const favorites = JSON.parse(localStorage.getItem('weatherFavorites')) || [];
 
@@ -611,7 +553,6 @@ function removeFavorite(city) {
     updateFavoriteButton(city);
 }
 
-// Fonction pour mettre à jour le bouton favoris
 function updateFavoriteButton(city) {
     const favorites = JSON.parse(localStorage.getItem('weatherFavorites')) || [];
 
@@ -624,7 +565,6 @@ function updateFavoriteButton(city) {
     }
 }
 
-// Écouteur d'événements pour le bouton de recherche
 document.getElementById('search-btn').addEventListener('click', () => {
     const city = document.getElementById('city-input').value.trim();
     if (city) {
@@ -632,7 +572,6 @@ document.getElementById('search-btn').addEventListener('click', () => {
     }
 });
 
-// Écouteur d'événements pour la touche Entrée
 document.getElementById('city-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const city = e.target.value.trim();
@@ -642,10 +581,8 @@ document.getElementById('city-input').addEventListener('keypress', (e) => {
     }
 });
 
-// Écouteur d'événements pour le bouton de géolocalisation
 locationBtn.addEventListener('click', getWeatherByLocation);
 
-// Écouteur d'événements pour le bouton favoris
 favoriteBtn.addEventListener('click', () => {
     const city = document.querySelector('.city-name').textContent.split(',')[0].trim();
 
@@ -660,10 +597,8 @@ favoriteBtn.addEventListener('click', () => {
     }
 });
 
-// Charger les favoris au démarrage
 loadFavorites();
 
-// Ajout des écouteurs d'événements pour les sélecteurs d'unités
 document.getElementById('temp-unit').addEventListener('change', (e) => {
     currentTempUnit = e.target.value;
     localStorage.setItem('tempUnit', currentTempUnit);
@@ -682,9 +617,7 @@ document.getElementById('wind-unit').addEventListener('change', (e) => {
     }
 });
 
-// Initialisation des sélecteurs d'unités
 document.getElementById('temp-unit').value = currentTempUnit;
 document.getElementById('wind-unit').value = currentWindUnit;
 
-// Charger l'historique des recherches au démarrage
 displaySearchHistory(); 
