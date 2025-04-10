@@ -1,4 +1,4 @@
-const API_KEY = '9c84c21b0c2c4c8c9c4c8c9c4c8c9c4c';
+const API_KEY = '6468fbaf5dc4d5c79fa066e77ead3d3a';
 const weatherInfo = document.querySelector('.weather-info');
 const forecastContainer = document.querySelector('.forecast-container');
 const loadingContainer = document.querySelector('.loading-container');
@@ -199,7 +199,7 @@ async function getWeather(city) {
         chartsContainer.classList.remove('active');
         weatherAlerts.style.display = 'none';
 
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=fr`);
+        const response = await fetch(`/api/weather/${city}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -227,7 +227,7 @@ async function getWeather(city) {
 
 async function getForecast(city) {
     try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=fr`);
+        const response = await fetch(`/api/forecast/${city}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -243,25 +243,30 @@ async function checkWeatherAlerts(city) {
     try {
         let url;
         if (typeof city === 'object' && city.lat && city.lon) {
-            url = `https://api.openweathermap.org/data/2.5/onecall?lat=${city.lat}&lon=${city.lon}&exclude=minutely,hourly,daily&appid=${API_KEY}&units=metric&lang=fr`;
+            const response = await fetch(`/api/alerts?lat=${city.lat}&lon=${city.lon}`);
+            const data = await response.json();
+
+            if (response.ok && data.alerts && data.alerts.length > 0) {
+                displayWeatherAlerts(data.alerts);
+            } else {
+                weatherAlerts.style.display = 'none';
+            }
         } else {
-            const geoResponse = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${API_KEY}`);
+            const geoResponse = await fetch(`/api/weather/${city}`);
             const geoData = await geoResponse.json();
 
-            if (geoData.length > 0) {
-                url = `https://api.openweathermap.org/data/2.5/onecall?lat=${geoData[0].lat}&lon=${geoData[0].lon}&exclude=minutely,hourly,daily&appid=${API_KEY}&units=metric&lang=fr`;
+            if (geoData.coord) {
+                const response = await fetch(`/api/alerts?lat=${geoData.coord.lat}&lon=${geoData.coord.lon}`);
+                const data = await response.json();
+
+                if (response.ok && data.alerts && data.alerts.length > 0) {
+                    displayWeatherAlerts(data.alerts);
+                } else {
+                    weatherAlerts.style.display = 'none';
+                }
             } else {
-                throw new Error('Ville non trouvée');
+                weatherAlerts.style.display = 'none';
             }
-        }
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (response.ok && data.alerts && data.alerts.length > 0) {
-            displayWeatherAlerts(data.alerts);
-        } else {
-            weatherAlerts.style.display = 'none';
         }
     } catch (error) {
         console.error('Erreur alertes:', error);
@@ -418,69 +423,42 @@ function createCharts(data) {
     chartsContainer.classList.add('active');
 }
 
-function getWeatherByLocation() {
-    if (navigator.geolocation) {
+async function getWeatherByLocation() {
+    try {
         loadingContainer.style.display = 'block';
         weatherInfo.classList.remove('active');
         forecastContainer.classList.remove('active');
         chartsContainer.classList.remove('active');
         weatherAlerts.style.display = 'none';
 
-        const options = {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        };
+        const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
 
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                try {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
+        const { latitude, longitude } = position.coords;
+        const response = await fetch(`/api/weather/coordinates?lat=${latitude}&lon=${longitude}`);
+        const data = await response.json();
 
-                    console.log(`Position obtenue: ${lat}, ${lon}`);
-
-                    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=fr`);
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        updateBackground(data.weather[0].id);
-
-                        loadingContainer.style.display = 'none';
-
-                        displayWeather(data);
-                        getForecastByCoords(lat, lon);
-                        checkWeatherAlerts({ lat, lon });
-
-                        updateFavoriteButton(data.name);
-                    } else {
-                        loadingContainer.style.display = 'none';
-                        alert('Impossible d\'obtenir la météo pour votre position.');
-                    }
-                } catch (error) {
-                    loadingContainer.style.display = 'none';
-                    console.error('Erreur:', error);
-                    alert('Une erreur est survenue. Veuillez réessayer.');
-                }
-            },
-            (error) => {
-                loadingContainer.style.display = 'none';
-                console.error('Erreur de géolocalisation:', error);
-
-                console.log('Utilisation de Paris 17e comme position par défaut');
-                getWeather('Paris,FR');
-            },
-            options
-        );
-    } else {
-        alert('La géolocalisation n\'est pas supportée par votre navigateur. Utilisation de Paris comme position par défaut.');
-        getWeather('Paris,FR');
+        if (response.ok) {
+            updateBackground(data.weather[0].id);
+            loadingContainer.style.display = 'none';
+            displayWeather(data);
+            getForecastByCoords(latitude, longitude);
+            checkWeatherAlerts({ lat: latitude, lon: longitude });
+        } else {
+            loadingContainer.style.display = 'none';
+            alert('Erreur lors de la récupération de la météo. Veuillez réessayer.');
+        }
+    } catch (error) {
+        loadingContainer.style.display = 'none';
+        console.error('Erreur géolocalisation:', error);
+        alert('Erreur de géolocalisation. Veuillez réessayer.');
     }
 }
 
 async function getForecastByCoords(lat, lon) {
     try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=fr`);
+        const response = await fetch(`/api/forecast/coordinates?lat=${lat}&lon=${lon}`);
         const data = await response.json();
 
         if (response.ok) {
