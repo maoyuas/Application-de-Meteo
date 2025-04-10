@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Application Météo</title>
+    <!-- Ajout de Chart.js pour les graphiques -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="default">
+    <div class="weather-app">
+        <h1>🌤️ Application Météo</h1>
+        <div class="search-container">
+            <input type="text" id="city-input" placeholder="Entrez le nom d'une ville...">
+            <button id="search-btn">Rechercher</button>
+            <button id="location-btn" title="Utiliser ma position">📍</button>
+        </div>
+
+        <!-- Animation de chargement -->
+        <div class="loading-container" style="display: none;">
+            <div class="loading">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+
+        <!-- Alertes météo -->
+        <div class="weather-alerts" style="display: none;">
+            <h3>⚠️ Alertes météo</h3>
+            <div class="alerts-container"></div>
+        </div>
+
+        <div class="weather-info">
+            <div class="city-name"></div>
+            <div class="current-time"></div>
+            <div class="weather-icon"></div>
+            <div class="temperature"></div>
+            <div class="weather-description"></div>
+            <div class="weather-details">
+                <div class="detail-item">
+                    <span class="detail-icon">💨</span>
+                    <span class="detail-value wind-speed"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">💧</span>
+                    <span class="detail-value humidity"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-icon">🌡️</span>
+                    <span class="detail-value feels-like"></span>
+                </div>
+            </div>
+
+            <!-- Bouton favoris -->
+            <button id="favorite-btn" class="favorite-btn">⭐ Ajouter aux favoris</button>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <h3>Température sur 5 jours</h3>
+                <canvas id="temp-chart"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Humidité sur 5 jours</h3>
+                <canvas id="humidity-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="forecast-container">
+            <h2>Prévisions sur 5 jours</h2>
+            <div class="forecast-list"></div>
+        </div>
+
+        <!-- Liste des favoris -->
+        <div class="favorites-container">
+            <h2>Mes villes favorites</h2>
+            <div class="favorites-list"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
