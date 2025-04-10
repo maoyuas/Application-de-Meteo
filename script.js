@@ -301,7 +301,7 @@ function displayWeather(data) {
     weatherDescription.textContent = data.weather[0].description;
     humidity.textContent = `${data.main.humidity}%`;
 
-    const iconCode = data.weather[0].icon;
+    const iconCode = data.weather?.[0]?.icon || "01d"; // Icône par défaut si vide
     weatherIcon.innerHTML = `<img src="http://openweathermap.org/img/wn/${iconCode}@2x.png" alt="Weather icon">`;
 
     updateDisplayWithUnits(data);
