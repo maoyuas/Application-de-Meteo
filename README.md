@@ -11,9 +11,8 @@ Une application météo moderne et interactive développée avec HTML, CSS et Ja
 - **Historique des recherches** : Accédez rapidement à vos dernières recherches
 - **Système de favoris** : Sauvegardez vos villes préférées
 - **Graphiques** : Visualisez les tendances de température et d'humidité
-- **Alertes météo** : Recevez des alertes pour les conditions météorologiques importantes
+- **Alertes météo** : Consultez les alertes météorologiques importantes
 - **Géolocalisation** : Obtenez la météo de votre position actuelle
-- **Fond dynamique** : Le fond change en fonction des conditions météorologiques
 
 ## 🚀 Installation
 
@@ -53,10 +52,10 @@ npm start
 ## 📱 Fonctionnalités détaillées
 
 ### Recherche et affichage
-- Barre de recherche avec autocomplétion
+- Barre de recherche
 - Affichage de la température actuelle
 - Description détaillée du temps
-- Icônes météorologiques dynamiques
+- Icônes météorologiques
 
 ### Prévisions
 - Vue sur 5 jours
@@ -74,7 +73,19 @@ npm start
 - Graphiques de température
 - Graphiques d'humidité
 - Alertes météorologiques
-- Fond dynamique selon le temps
+
+## 📦 Structure du projet
+
+```
+├── index.html
+├── styles.css
+├── script.js
+├── public/
+├── server.js
+├── package.json
+├── .env
+└── README.md
+```
 
 ## 🔑 Configuration
 
@@ -88,19 +99,6 @@ Pour utiliser l'application, vous devez :
 2. Configurer le serveur :
    - Le serveur utilise le port 3000 par défaut
    - Les requêtes API sont limitées selon votre plan OpenWeatherMap
-
-## 📦 Structure du projet
-
-```
-├── public/
-│   ├── index.html
-│   ├── styles.css
-│   └── script.js
-├── server.js
-├── package.json
-├── .env
-└── README.md
-```
 
 ## 🤝 Contribution
 
@@ -118,7 +116,7 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 👥 Auteurs
 
-- [Votre Nom]
+- Aya Moustaquim
 
 ## 🙏 Remerciements
 
