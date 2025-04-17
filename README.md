@@ -11,15 +11,11 @@ Une application météo moderne et interactive développée avec HTML, CSS et Ja
 - **Historique des recherches** : Accédez rapidement à vos dernières recherches
 - **Système de favoris** : Sauvegardez vos villes préférées
 - **Graphiques** : Visualisez les tendances de température et d'humidité
-- **Alertes météo** : Consultez les alertes météorologiques importantes
 - **Géolocalisation** : Obtenez la météo de votre position actuelle
 
 ## 🚀 Installation
 
-1. Clonez le dépôt :
-```bash
-git clone [URL_DU_REPO]
-```
+1. Téléchargez ou clonez le projet
 
 2. Installez les dépendances :
 ```bash
@@ -72,19 +68,19 @@ npm start
 ### Visualisation
 - Graphiques de température
 - Graphiques d'humidité
-- Alertes météorologiques
 
 ## 📦 Structure du projet
 
 ```
-├── index.html
-├── styles.css
-├── script.js
 ├── public/
-├── server.js
-├── package.json
-├── .env
-└── README.md
+│   ├── index.html    # Page principale
+│   ├── styles.css    # Styles de l'application
+│   ├── script.js     # Code JavaScript client
+│   └── assets/       # Images et ressources
+├── server.js         # Serveur Node.js
+├── package.json      # Dépendances du projet
+├── .env             # Configuration (clés API)
+└── README.md        # Documentation
 ```
 
 ## 🔑 Configuration
@@ -99,20 +95,6 @@ Pour utiliser l'application, vous devez :
 2. Configurer le serveur :
    - Le serveur utilise le port 3000 par défaut
    - Les requêtes API sont limitées selon votre plan OpenWeatherMap
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! Pour contribuer :
-
-1. Fork le projet
-2. Créez une branche pour votre fonctionnalité
-3. Committez vos changements
-4. Poussez vers la branche
-5. Ouvrez une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 👥 Auteurs
 

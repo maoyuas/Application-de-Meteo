@@ -314,7 +314,6 @@ function getWeatherByLocation() {
         chartsContainer.classList.remove('active');
         weatherAlerts.style.display = 'none';
 
-        // Options pour améliorer la précision de la géolocalisation
         const options = {
             enableHighAccuracy: true,
             timeout: 10000,
@@ -329,39 +328,39 @@ function getWeatherByLocation() {
 
                     console.log(`Position obtenue: ${lat}, ${lon}`);
 
-                    // Utiliser l'API Node.js
-                    const response = await fetch(`/api/weather/coordinates?lat=${lat}&lon=${lon}`);
+                    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=6468fbaf5dc4d5c79fa066e77ead3d3a&units=metric`);
+
                     const data = await response.json();
 
-                    if (response.ok) {
-                        // Mettre à jour le fond selon le temps
-                        updateBackground(data.weather[0].id);
+                    console.log('Réponse de l\'API:', data); // Ajout du log pour examiner la réponse
 
-                        // Masquer l'animation de chargement
+                    if (response.ok && data.weather && data.weather.length > 0) {
+                        updateBackground(data.weather[0].id);
                         loadingContainer.style.display = 'none';
 
                         displayWeather(data);
                         getForecastByCoords(lat, lon);
                         checkWeatherAlerts({ lat, lon });
 
-                        // Mettre à jour le bouton favoris
                         updateFavoriteButton(data.name);
                     } else {
                         loadingContainer.style.display = 'none';
                         alert('Impossible d\'obtenir la météo pour votre position.');
                     }
+
                 } catch (error) {
                     loadingContainer.style.display = 'none';
                     console.error('Erreur:', error);
                     alert('Une erreur est survenue. Veuillez réessayer.');
+
+                    console.log('Utilisation de Paris 17e comme position par défaut');
+                    getWeather('Paris,FR');
                 }
             },
             (error) => {
                 loadingContainer.style.display = 'none';
-                console.error('Erreur de géolocalisation:', error);
-
-                // En cas d'erreur de géolocalisation, utiliser Paris 17e comme position par défaut
-                console.log('Utilisation de Paris 17e comme position par défaut');
+                console.error('Erreur de géolocalisation:', error); // Ajout du log pour examiner l'erreur de géolocalisation
+                alert('La géolocalisation a échoué. Utilisation de Paris 17e comme position par défaut.');
                 getWeather('Paris,FR');
             },
             options
@@ -371,6 +370,8 @@ function getWeatherByLocation() {
         getWeather('Paris,FR');
     }
 }
+
+
 
 // Fonction pour obtenir les prévisions par coordonnées
 async function getForecastByCoords(lat, lon) {
